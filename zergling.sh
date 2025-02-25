@@ -1,0 +1,54 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+STOP=10
+USE_PROCD=1
+
+OVERLORD_USER=${OVERLORD_USER:-"overlord"}
+OVERLORD_HOST=${OVERLORD_HOST:-"example.com"}
+OVERLORD_PORT=${OVERLORD_PORT:-22}
+LOCAL_SSH_PORT=${LOCAL_SSH_PORT:-22}
+SSH_KEY=${SSH_KEY:-"/root/.ssh/zerling_ssh_key"}
+SSH_TUNNEL_PORT=${SSH_TUNNEL_PORT:-}
+ZERLING_ID=${ZERLING_ID:-1234}
+REG_FILE=${REG_FILE:-"/var/lib/regs/${ZERLING_ID}"}
+REG_VAR="port is ${SSH_TUNNEL_PORT}"
+
+start_service() {
+    logger "Starting SSH tunnel service..."
+    
+    # Check if autossh is installed
+    if ! command -v autossh >/dev/null 2>&1; then
+        logger "Error: autossh is not installed. Exiting."
+        exit 1
+    fi
+    
+    # Wait until the internet connection is available
+    while ! ping -c 1 1.1.1.1 >/dev/null 2>&1; do
+        sleep 5
+    done
+    logger "Internet connection detected."
+    
+    # Start reverse SSH tunnel using autossh
+    procd_open_instance
+    procd_set_param command autossh -N -R 127.0.0.1:${SSH_TUNNEL_PORT}:localhost:${LOCAL_SSH_PORT} \
+        -o ServerAliveInterval=60 -o ExitOnForwardFailure=yes \
+        -i ${SSH_KEY} ${REMOTE_USER}@${REMOTE_HOST} -p ${REMOTE_PORT}
+    procd_set_param respawn
+    procd_close_instance
+    
+    # Create the registration file on the remote server
+    ssh -i ${SSH_KEY} ${REMOTE_USER}@${REMOTE_HOST} "mkdir -p $(dirname ${REG_FILE}) && echo ${REG_VAR} > ${REG_FILE}"
+    logger "SSH tunnel established and remote registration file created."
+}
+
+stop_service() {
+    logger "Stopping SSH tunnel service..."
+    procd_kill
+    
+    # Remove the registration file on the remote server
+    ssh -i ${SSH_KEY} ${REMOTE_USER}@${REMOTE_HOST} "rm -f ${REG_FILE}"
+    logger "Remote registration file removed."
+    
+    logger "SSH tunnel stopped."
+}
