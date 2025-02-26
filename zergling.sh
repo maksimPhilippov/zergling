@@ -15,11 +15,11 @@ REG_FILE=${REG_FILE:-"/var/lib/regs/${ZERLING_ID}"}
 REG_VAR="port is ${SSH_TUNNEL_PORT}"
 
 start_service() {
-    logger "Starting SSH tunnel service..."
+    logger -t zerling "Starting SSH tunnel service..."
     
     # Check if autossh is installed
     if ! command -v autossh >/dev/null 2>&1; then
-        logger "Error: autossh is not installed. Exiting."
+        logger -t zerling "Error: autossh is not installed. Exiting."
         exit 1
     fi
     
@@ -27,7 +27,7 @@ start_service() {
     while ! ping -c 1 1.1.1.1 >/dev/null 2>&1; do
         sleep 5
     done
-    logger "Internet connection detected."
+    logger -t zerling "Internet connection detected."
     
     # Start reverse SSH tunnel using autossh
     procd_open_instance
@@ -39,16 +39,16 @@ start_service() {
     
     # Create the registration file on the remote server
     ssh -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} "mkdir -p $(dirname ${REG_FILE}) && echo ${REG_VAR} > ${REG_FILE}"
-    logger "SSH tunnel established and remote registration file created."
+    logger -t zerling "SSH tunnel established and remote registration file created."
 }
 
 stop_service() {
-    logger "Stopping SSH tunnel service..."
+    logger -t zerling "Stopping SSH tunnel service..."
     procd_kill
     
     # Remove the registration file on the remote server
     ssh -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} "rm -f ${REG_FILE}"
-    logger "Remote registration file removed."
+    logger -t zerling "Remote registration file removed."
     
-    logger "SSH tunnel stopped."
+    logger -t zerling "SSH tunnel stopped."
 }
