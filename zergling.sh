@@ -33,12 +33,12 @@ start_service() {
     procd_open_instance
     procd_set_param command autossh -N -R 127.0.0.1:${SSH_TUNNEL_PORT}:localhost:${LOCAL_SSH_PORT} \
         -o ServerAliveInterval=60 -o ExitOnForwardFailure=yes \
-        -i ${SSH_KEY} ${REMOTE_USER}@${REMOTE_HOST} -p ${REMOTE_PORT}
+        -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} -p ${OVERLORD_PORT}
     procd_set_param respawn
     procd_close_instance
     
     # Create the registration file on the remote server
-    ssh -i ${SSH_KEY} ${REMOTE_USER}@${REMOTE_HOST} "mkdir -p $(dirname ${REG_FILE}) && echo ${REG_VAR} > ${REG_FILE}"
+    ssh -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} "mkdir -p $(dirname ${REG_FILE}) && echo ${REG_VAR} > ${REG_FILE}"
     logger "SSH tunnel established and remote registration file created."
 }
 
@@ -47,7 +47,7 @@ stop_service() {
     procd_kill
     
     # Remove the registration file on the remote server
-    ssh -i ${SSH_KEY} ${REMOTE_USER}@${REMOTE_HOST} "rm -f ${REG_FILE}"
+    ssh -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} "rm -f ${REG_FILE}"
     logger "Remote registration file removed."
     
     logger "SSH tunnel stopped."
