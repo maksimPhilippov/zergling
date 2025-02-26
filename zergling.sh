@@ -34,7 +34,7 @@ start_service() {
     
     # Start reverse SSH tunnel using autossh
     procd_open_instance
-    procd_set_param command autossh -N -R 127.0.0.1:${SSH_TUNNEL_PORT}:localhost:${LOCAL_SSH_PORT} \
+    procd_set_param command /usr/sbin/autossh -N -R 127.0.0.1:${SSH_TUNNEL_PORT}:localhost:${LOCAL_SSH_PORT} \
         -o ServerAliveInterval=60 -o ExitOnForwardFailure=yes \
         -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} -p ${OVERLORD_PORT}
     procd_set_param respawn
