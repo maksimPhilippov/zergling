@@ -4,13 +4,18 @@ START=99
 STOP=10
 USE_PROCD=1
 
-# Probably you want to change
-OVERLORD_HOST=${OVERLORD_HOST:-"example.com"}
-OVERLORD_PORT=${OVERLORD_PORT:-22}
-SSH_TUNNEL_PORT=${SSH_TUNNEL_PORT:-2000}
-ZERGLING_ID=${ZERGLING_ID:-"ZerglingID"}
+# Probably you want to change these variables:
+# Adress of overlord(ip address, or dns name)
+OVERLORD_HOST=${OVERLORD_HOST:-overlord_host_sed_template}
+# Port of ssh server on overlord, that we are connecting to
+OVERLORD_PORT=${OVERLORD_PORT:-overlord_port_sed_template}
+# Port on overlord that will be created after zerling successful connect, number from 2000 to 62000
+SSH_TUNNEL_PORT=${SSH_TUNNEL_PORT:-ssh_tunnel_port_sed_template}
+# Name of registration file on overlord
+ZERGLING_ID=${ZERGLING_ID:-"zergling_id_sed_template"}
 
-# Probably you don't want to change
+
+# Probably you don't want to change these variables:
 OVERLORD_USER=${OVERLORD_USER:-"overlord"}
 LOCAL_SSH_PORT=${LOCAL_SSH_PORT:-22}
 SSH_KEY=${SSH_KEY:-"/root/.ssh/zergling_ssh_key"}
