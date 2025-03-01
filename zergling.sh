@@ -44,7 +44,7 @@ start_service() {
     procd_close_instance
     
     # Create the registration file on the remote server
-    ssh -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} "$REG_VAR"
+    HOME=/root ssh -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} "$REG_VAR"
     logger -t zergling "SSH tunnel established and overlord got connection registration"
 }
 
