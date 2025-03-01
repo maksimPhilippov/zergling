@@ -14,8 +14,9 @@ ping github.com
 ```
 3. Run installer on router:
 ```
-cd
-wget https://raw.githubusercontent.com/maksimPhilippov/zergling/refs/heads/zergling_installer.sh && chmod +x zergling_installer.sh
+cd ; wget https://raw.githubusercontent.com/maksimPhilippov/zergling/refs/heads/zergling_installer.sh && chmod +x zergling_installer.sh
+```
+```
 ./zergling_installer.sh <overlord address> <overlord server port> <tunnel port> <unique zerling id>
 ```
 4. Make sure you can connect to your server without password
