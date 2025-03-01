@@ -19,8 +19,7 @@ ZERGLING_ID=${ZERGLING_ID:-"zergling_id_sed_template"}
 OVERLORD_USER=${OVERLORD_USER:-"overlord"}
 LOCAL_SSH_PORT=${LOCAL_SSH_PORT:-22}
 SSH_KEY=${SSH_KEY:-"/root/.ssh/zergling_ssh_key"}
-REG_FILE=${REG_FILE:-"/var/lib/regs/${ZERGLING_ID}"}
-REG_VAR="port is ${SSH_TUNNEL_PORT}"
+REG_VAR="./register.sh ${ZERGLING_ID} ${SSH_TUNNEL_PORT}"
 ETHERNAL_LOOP="while true ; do sleep 1h ; done"
 
 start_service() {
@@ -45,8 +44,8 @@ start_service() {
     procd_close_instance
     
     # Create the registration file on the remote server
-    ssh -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} "mkdir -p $(dirname ${REG_FILE}) && echo ${REG_VAR} > ${REG_FILE} && date >> ${REG_FILE}"
-    logger -t zergling "SSH tunnel established and remote registration file created."
+    ssh -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} "$REG_VAR"
+    logger -t zergling "SSH tunnel established and overlord got connection registration"
 }
 
 stop_service() {
@@ -54,8 +53,7 @@ stop_service() {
     procd_kill
     
     # Remove the registration file on the remote server
-    ssh -i ${SSH_KEY} ${OVERLORD_USER}@${OVERLORD_HOST} "rm -f ${REG_FILE}"
-    logger -t zergling "Remote registration file removed."
+    logger -t zergling "Warning: overlord was not notificated about zerling stop, not supported yet"
     
     logger -t zergling "SSH tunnel stopped."
 }

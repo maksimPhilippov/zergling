@@ -79,7 +79,7 @@ if [ -f "$KEY_FILE.pub" ] ; then
   PUBLIC_KEY=$( cat "$KEY_FILE.pub" )
   echo "Authorize in the overlord please"
   sleep 2
-  echo "$PUBLIC_KEY" | ssh "overlord@${OVERLORD_ADDR}" 'echo >> .ssh/authorized_keys'
+  ssh "overlord@${OVERLORD_ADDR}" "echo \"$PUBLIC_KEY\" >> .ssh/authorized_keys"
   echo "Please ensure that next command runs WITHOUT asking password:"
   echo "ssh -i $KEY_FILE -p $OVERLORD_PORT overlord@$OVERLORD_ADDR"
   exit 0
