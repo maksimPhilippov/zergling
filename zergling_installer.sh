@@ -1,20 +1,39 @@
 #!/bin/sh
 
+usage() {
+  echo "$0 <overlord address> <overlord server port> <tunnel port> <unique zerling id>"
+}
+
 if [ -z $1 ] ; then 
   echo "Fail: no overlord address specified"
+  usage
   exit 1
 fi
 if [ -z $2 ] ; then 
-  echo "Fail: no overlord port specified"
+  echo "Fail: overlord port not specified"
+  usage
+  exit 1
+fi
+if [ -z $3 ] ; then 
+  echo "Fail: tunnel port not specified"
+  usage
+  exit 1
+fi
+if [ -z $4 ] ; then 
+  echo "Fail: zerling id not specified"
+  usage
   exit 1
 fi
 
-KEY_FILE=/root/.ssh/zergling_ssh_key
 OVERLORD_ADDR="$1"
 OVERLORD_PORT="$2"
+TUNNEL_PORT="$3"
+ZERGLING_ID="$4"
 ZERGLING_VERSION=${ZERGLING_VERSION:-1.0.0}
+KEY_FILE=/root/.ssh/zergling_ssh_key
 SERVICE_FILE=/etc/init.d/zergling
 SERVICE_BACKUP_NAME=/etc/init.d/zergling.back
+
 
 if [ -f "$KEY_FILE" ] ; then
   echo "Key file already exist, skip creating ssh keys"
@@ -32,9 +51,15 @@ else
     cat $SERVICE_FILE >$SERVICE_BACKUP_NAME
   fi
 
+  echo "begin download $ZERGLING_VERSION version of zerling"
+  sleep 1
   wget -O $SERVICE_FILE "https://raw.githubusercontent.com/maksimPhilippov/zergling/$ZERGLING_VERSION/zergling.sh"
   if [ $? ] ; then
     chmod +x $SERVICE_FILE
+    sed -i "s/overlord_host_sed_template/$OVERLORD_ADDR/" "$SERVICE_FILE"
+    sed -i "s/overlord_port_sed_template/$OVERLORD_PORT/" "$SERVICE_FILE"
+    sed -i "s/ssh_tunnel_port_sed_template/$TUNNEL_PORT/" "$SERVICE_FILE"
+    sed -i "s/zergling_id_sed_template/$ZERGLING_ID/" "$SERVICE_FILE"
     $SERVICE_FILE enable
     $SERVICE_FILE status
   else
