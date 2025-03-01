@@ -31,5 +31,5 @@ ssh root@localhost -p <port from registration file>
 
 In order to forward web UI to server run this comman on the router:
 ```
-ssh -R <port on the server>:localhost:80
+ssh -i /root/.ssh/zergling_ssh_key -R <port on the server>:localhost:80 overlord@<overlord address>
 ```
