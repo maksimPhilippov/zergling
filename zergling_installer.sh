@@ -38,6 +38,7 @@ SERVICE_BACKUP_NAME=/etc/init.d/zergling.back
 if [ -f "$KEY_FILE" ] ; then
   echo "Key file already exist, skip creating ssh keys"
 else
+  mkdir -p /root/.ssh
   ssh-keygen -t ed25519 -f /root/.ssh/zergling_ssh_key
 fi
 
