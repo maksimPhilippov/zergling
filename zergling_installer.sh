@@ -29,18 +29,10 @@ OVERLORD_ADDR="$1"
 OVERLORD_PORT="$2"
 TUNNEL_PORT="$3"
 ZERGLING_ID="$4"
-ZERGLING_VERSION=${ZERGLING_VERSION:-1.0.0}
+ZERGLING_VERSION=${ZERGLING_VERSION:-1.0.1}
 KEY_FILE=/root/.ssh/zergling_ssh_key
 SERVICE_FILE=/etc/init.d/zergling
 SERVICE_BACKUP_NAME=/etc/init.d/zergling.back
-
-
-if [ -f "$KEY_FILE" ] ; then
-  echo "Key file already exist, skip creating ssh keys"
-else
-  mkdir -p /root/.ssh
-  ssh-keygen -t ed25519 -f /root/.ssh/zergling_ssh_key
-fi
 
 if [ ! which wget ] ; then
   echo "Fail: wget not found on system, please install it"
@@ -74,6 +66,13 @@ else
       echo "No backup found in $SERVICE_BACKUP_NAME"
     fi
   fi
+fi
+
+if [ -f "$KEY_FILE" ] ; then
+  echo "Key file already exist, skip creating ssh keys"
+else
+  mkdir -p /root/.ssh
+  ssh-keygen -y -t ed25519 -f $KEY_FILE
 fi
 
 if [ -f "$KEY_FILE.pub" ] ; then
